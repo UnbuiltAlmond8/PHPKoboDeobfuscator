@@ -7,3 +7,6 @@ This tool is targeted at normal developers who have a hard time deobfuscating ev
 
 ## How is this different from https://blog.deobfuscate.io/investigating-html-obfuscator?
 This deobfuscator performs the majority of the process in Node.js, an isolated environment, but defers getting the second layer to the browser on a modified version of the obfuscated HTML file that does not execute said second layer, with the debugger in place to avoid execution from elsewhere like redirects. It also removes the need for document.write entirely and allows developers to perform deobfuscation without the need to inject a document.write arrow function hook.
+
+## Can't I just simply inject the hook from that blog post?
+You could inject the hook: `;document._write = document.write;hook = (code) => {console.log(code); document._write(code)};document.write = hook;`, but then that would make the environment run entirely in the browser which can come with security risks if not handled carefully. This deobfuscator offers the convenience in Node.js without having to mock document.write or an entire browser. It is, however, a necessary alternative for the legacy structure.
