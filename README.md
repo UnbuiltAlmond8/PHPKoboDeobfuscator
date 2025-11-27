@@ -16,6 +16,6 @@ Well I plan to make an unified deobfuscator that uses the hook method alongside 
 
 For PHPKobo's Elements Tab Obfuscator, the obfuscation is powered entirely by a single JavaScript file, making it extremely easy to circumvent by finding and then blockiing the file in network requests; if the Elements Tab obfuscator is within an unrelated file, conditional breakpoints can be abused to skip the obfuscator logic entirely; or alternatively, download the HTML, remove the obfuscator, and then open the file, but you might still need to first deobfuscate the HTML as well if it's been obfuscated.
 
-For the CSS Obfuscator, a simple `CSSStyleSheet.prototype.insertRule;hook = (code) => console.log(code);CSSStyleSheet.prototype.insertRule = hook;` hook ruins it all, printing each and every rule to the console. I didn't bother making a deobfuscator for that now due to the vastly different and more confusing structure, even despite being less heavy.
+For the CSS Obfuscator, a simple `;CSSStyleSheet.prototype.insertRule = (code) => console.log(code);` hook ruins it all, printing each and every rule to the console. I didn't bother making a deobfuscator for that now due to the vastly different and more confusing structure, even despite being less heavy.
 
 I have reverse engineered the Elements Tab Obfuscator, see https://gist.github.com/UnbuiltAlmond8/bd5642276b702bf02999a62a4de2f0e7 for a script with readable variable names, the free trial check, and more.
