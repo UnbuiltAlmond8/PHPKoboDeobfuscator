@@ -1,3 +1,5 @@
+# NOTE: A new and unified deobfuscator, which can work with the legacy structure, is now available. Read further for the new deobfuscator.
+
 # PHPKoboDeobfuscator
 This JS file is a helper to significantly facilitate the deobfuscation of HTML files that have been obfuscated with PHPKobo since 2025-05-01.
 Note: Due to the different structure used before 2025-05-01, this deobfuscator currently does not work on this older structure.
@@ -29,4 +31,4 @@ Okay fine, here it is:
   eval(hook + code)
 })(`PHPKobo code goes here`)
 ```
-You simply look for the large obfuscated portion `Function('...')()` within the target file, put it in place of `PHPKobo code goes here`, and go. After running, check the console to get the raw HTML and CSS. Remember to also discover all assets and block the Elements Tab Obfuscator!
+Note that it does not use JSDON, but you can pair this with JSDOM to generate necessary context directly in Node.js. This unified deobfuscator works even for files created before 2025-01-01. To use it, uou simply look for the large obfuscated portion `Function('...')()` within the target file, put it in place of `PHPKobo code goes here`, and go. After running, check the console to get the raw HTML and CSS. Remember to also discover all assets and block the Elements Tab Obfuscator!
