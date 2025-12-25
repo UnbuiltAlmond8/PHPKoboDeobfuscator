@@ -12,10 +12,21 @@ This deobfuscator performs the majority of the process in Node.js, an isolated e
 You could inject the hook: `;document._write = document.write;hook = (code) => console.log(code);document.write = hook;`, but then that would make the environment run entirely in the browser which can come with security risks if not handled carefully. This deobfuscator offers the convenience in Node.js without having to mock document.write or an entire browser. It is, however, a necessary alternative for the legacy structure.
 
 ## What about the CSS deobfuscator and the Elements Tab deobfuscator?
-Well I plan to make an unified deobfuscator that uses the hook method alongside JSDOM in order to safely deobfuscate both the HTML and CSS obfuscation by PHPKobo (they use different methods by the way).
+An unified deobfuscator that uses the hook method, with anti-fetch protection for safety, to deobfuscate both the HTML and CSS obfuscation by PHPKobo (they use different methods by the way) is now available.
 
 For PHPKobo's Elements Tab Obfuscator, the obfuscation is powered entirely by a single JavaScript file, making it extremely easy to circumvent by finding and then blockiing the file in network requests; if the Elements Tab obfuscator is within an unrelated file, conditional breakpoints can be abused to skip the obfuscator logic entirely; or alternatively, download the HTML, remove the obfuscator, and then open the file, but you might still need to first deobfuscate the HTML as well if it's been obfuscated.
 
-For the CSS Obfuscator, a simple `;CSSStyleSheet.prototype.insertRule = (code) => console.log(code);` hook ruins it all, printing each and every rule to the console. I didn't bother making a deobfuscator for that now due to the vastly different and more confusing structure, even despite being less heavy.
+I have additionally reverse engineered the Elements Tab Obfuscator, see https://gist.github.com/UnbuiltAlmond8/bd5642276b702bf02999a62a4de2f0e7 for a script with readable variable names, the free trial check, and more.
 
-I have reverse engineered the Elements Tab Obfuscator, see https://gist.github.com/UnbuiltAlmond8/bd5642276b702bf02999a62a4de2f0e7 for a script with readable variable names, the free trial check, and more.
+## Give me the unified deobfuscator!
+Okay fine, here it is:
+```javascript
+(function (code, allowFetch = false) {
+  hook = `hook1 = (code) => console.log(code);document.write = hook;hook2 = (code) => console.log(code);CSSStyleSheet.prototype.insertRule = hook2;`
+  if (!allowFetch) {
+    hook = hook + 'fetch=()=>{};XMLHttpRequest=()=>{};'
+  };
+  eval(hook + code)
+})(`PHPKobo code goes here`)
+```
+You simply look for the large obfuscated portion `Function('...')()` within the target file, put it in place of `PHPKobo code goes here`, and go. After running, check the console to get the raw HTML and CSS. Remember to also discover all assets and block the Elements Tab Obfuscator!
