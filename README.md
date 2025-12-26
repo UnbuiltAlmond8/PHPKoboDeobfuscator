@@ -23,12 +23,40 @@ I have additionally reverse engineered the Elements Tab Obfuscator, see https://
 ## Give me the unified deobfuscator!
 Okay fine, here it is:
 ```javascript
+function deobfuscateLink(target) {
+    const JSON5 = require('json5');
+
+    obfuscated_object = JSON5.parse(target.split('=this;')[1].split('}')[0].split('=')[1] + '}');
+    keyIndex = /-\d+/.exec(target);
+    if (keyIndex === null) keyIndex = /\+\d+/.exec(target);
+    key = Number(keyIndex[0]);
+
+    results = [];
+
+    for (const prop of Object.keys(obfuscated_object)) {
+        obfuscated_value = obfuscated_object[prop];
+        if (typeof obfuscated_value === 'string') {
+            result = obfuscated_value.split(":").map((prop2)=>String.fromCharCode(obfuscated_object[prop2] + key)).join("");
+            results.push(result);
+        }
+    };
+
+    link = results.filter(value => value.includes('.') && !(value.startsWith('a[')))[0];
+    console.log(link);
+};
+
 (function (code, allowFetch = false) {
   hook = `hook1 = (code) => console.log(code);document.write = hook;hook2 = (code) => console.log(code);CSSStyleSheet.prototype.insertRule = hook2;`
   if (!allowFetch) {
     hook = hook + 'fetch=()=>{};XMLHttpRequest=()=>{};'
   };
-  eval(hook + code)
+  try {
+    // initially assume a link obfuscated with the Link Obfuscator
+    deobfuscateLink(code)
+  } catch {
+    // otherwise, assume HTML or CSS obfuscation
+    eval(hook + code)
+  }
 })(`PHPKobo code goes here`)
 ```
-Note that it does not use JSDOM, but you can pair this with JSDOM to generate necessary context directly in Node.js. This unified deobfuscator works even for files created before 2025-05-01. To use it, you simply look for the large obfuscated portion `Function('...')()` within the target file, put it in place of `PHPKobo code goes here`, and go. After running, check the console to get the raw HTML and CSS. Remember to also discover all assets and block the Elements Tab Obfuscator!
+Note that it does not use JSDOM, but you can pair this with JSDOM to generate necessary context directly in Node.js. This unified deobfuscator works even for files created before 2025-05-01 and even for files obfuscated with the PHPKobo Link Obfuscator. To use it, you simply look for the large obfuscated portion `Function('...')()` (or `(function(...){Function(...,...["..."]=...)(...,...["..."]=...);})({});` for the link) within the target file, put it in place of `PHPKobo code goes here`, and go. After running, check the console to get the raw HTML, CSS or link. Remember to also discover all assets and block the Elements Tab Obfuscator!
