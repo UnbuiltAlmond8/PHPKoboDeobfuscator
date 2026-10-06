@@ -46,8 +46,9 @@ function deobfuscateLink(target) {
 };
 
 (function (code, allowFetch = false) {
-  hook = `hook1 = (code) => console.log(code);document.write = hook;hook2 = (code) => console.log(code);CSSStyleSheet.prototype.insertRule = hook2;`
+  hook = `hook1 = (code) => console.log(code);document.write = hook1;hook2 = (code) => console.log(code);CSSStyleSheet.prototype.insertRule = hook2;`
   if (!allowFetch) {
+    // provides basic protection, but ideally use OS level sandboxing
     hook = hook + 'fetch=()=>{};XMLHttpRequest=()=>{};'
   };
   try {
